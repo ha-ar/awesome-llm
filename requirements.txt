@@ -1,0 +1,13 @@
+gradio
+transformers>=4.42.0
+torch
+accelerate
+numpy
+scipy
+soundfile
+mishkal
+safetensors
+python-bidi
+arabic-reshaper
+requests>=2.31.0
+pathlib>=1.0.1
