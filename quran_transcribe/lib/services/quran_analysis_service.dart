@@ -51,6 +51,14 @@ class QuranAnalysisService {
   /// Copy Python files from assets to app directory
   static Future<void> _copyPythonAssets() async {
     try {
+      // On Android with Chaquopy, Python files are bundled in the APK
+      // No need to copy them. For desktop platforms, copy if needed.
+      if (Platform.isAndroid || Platform.isIOS) {
+        print('📱 Python files are bundled in the app package');
+        return;
+      }
+
+      // For desktop platforms, copy Python files
       final appDir = await getApplicationDocumentsDirectory();
       final pythonDir = Directory('${appDir.path}/python');
 
@@ -80,49 +88,70 @@ class QuranAnalysisService {
     }
   }
 
-  /// Start Python server as a subprocess
+  /// Start Python server using platform channel (for mobile)
   static Future<bool> _startPythonServer() async {
     if (_serverRunning) return true;
 
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final pythonDir = '${appDir.path}/python';
+      print('🐍 Starting Python server via platform channel...');
 
-      print('🐍 Starting Python server...');
-
-      // Try different Python commands
-      List<String> pythonCommands = ['python3', 'python', 'py'];
-
-      for (String pythonCmd in pythonCommands) {
+      // On mobile platforms (Android/iOS), use platform channel
+      if (Platform.isAndroid || Platform.isIOS) {
+        const platform = MethodChannel('com.example.quran_transcribe/python');
+        
         try {
-          _pythonProcess = await Process.start(
-            pythonCmd,
-            ['quran_server.py'],
-            workingDirectory: pythonDir,
-            environment: {'PYTHONUNBUFFERED': '1'},
-          );
-
-          // Listen to process output
-          _pythonProcess!.stdout.transform(utf8.decoder).listen((data) {
-            print('Python: $data');
-          });
-
-          _pythonProcess!.stderr.transform(utf8.decoder).listen((data) {
-            print('Python Error: $data');
-          });
-
+          // Initialize Python
+          await platform.invokeMethod('initializePython');
+          print('✅ Python initialized');
+          
+          // Start server
+          await platform.invokeMethod('startPythonServer');
           _serverRunning = true;
-          print('✅ Python server started with $pythonCmd');
+          print('✅ Python server started via platform channel');
           return true;
-
         } catch (e) {
-          print('⚠️ Failed to start with $pythonCmd: $e');
-          continue;
+          print('❌ Platform channel error: $e');
+          return false;
         }
-      }
+      } else {
+        // On desktop platforms (Windows/macOS/Linux), use Process.start()
+        final appDir = await getApplicationDocumentsDirectory();
+        final pythonDir = '${appDir.path}/python';
 
-      print('❌ Could not start Python server with any command');
-      return false;
+        // Try different Python commands
+        List<String> pythonCommands = ['python3', 'python', 'py'];
+
+        for (String pythonCmd in pythonCommands) {
+          try {
+            _pythonProcess = await Process.start(
+              pythonCmd,
+              ['quran_server.py'],
+              workingDirectory: pythonDir,
+              environment: {'PYTHONUNBUFFERED': '1'},
+            );
+
+            // Listen to process output
+            _pythonProcess!.stdout.transform(utf8.decoder).listen((data) {
+              print('Python: $data');
+            });
+
+            _pythonProcess!.stderr.transform(utf8.decoder).listen((data) {
+              print('Python Error: $data');
+            });
+
+            _serverRunning = true;
+            print('✅ Python server started with $pythonCmd');
+            return true;
+
+          } catch (e) {
+            print('⚠️ Failed to start with $pythonCmd: $e');
+            continue;
+          }
+        }
+
+        print('❌ Could not start Python server with any command');
+        return false;
+      }
 
     } catch (e) {
       print('❌ Error starting Python server: $e');
