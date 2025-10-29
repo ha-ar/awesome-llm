@@ -380,7 +380,9 @@ def analyze():
             return jsonify(asdict(result))
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Log the error internally but don't expose details to user
+        print(f"❌ Analysis error: {e}")
+        return jsonify({"error": "Analysis failed. Please try again."}), 500
 
 @app.route('/verse/<surah>/<ayah>', methods=['GET'])
 def get_verse(surah, ayah):
@@ -389,7 +391,9 @@ def get_verse(surah, ayah):
         verse = analyzer.get_verse(f"{surah}:{ayah}")
         return jsonify({"verse": verse, "reference": f"{surah}:{ayah}"})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Log the error internally but don't expose details to user
+        print(f"❌ Get verse error: {e}")
+        return jsonify({"error": "Failed to retrieve verse. Please check the reference."}), 500
 
 # Server management
 class ServerThread(threading.Thread):
