@@ -312,9 +312,9 @@ flutter build appbundle --release
 ```
 Add any additional notes, issues found, or special considerations:
 
-- 
-- 
-- 
+- [Your notes here]
+- [Any issues discovered during testing]
+- [Special considerations or observations]
 ```
 
 ---

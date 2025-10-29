@@ -25,7 +25,7 @@ Desktop web interface with real-time transcription and analysis.
 ### 📱 Mobile Application (Flutter)
 Cross-platform mobile app with on-device Python integration.
 - **Location:** `quran_transcribe/`
-- **Platform:** Android (✅), iOS (⚠️), Desktop (✅)
+- **Platform:** Android (✅), iOS (⚠️ partial support), Desktop (✅)
 - **Setup:** [quran_transcribe/MOBILE_SETUP.md](quran_transcribe/MOBILE_SETUP.md)
 - **Quick Start:** [quran_transcribe/QUICK_START_MOBILE.md](quran_transcribe/QUICK_START_MOBILE.md)
 
@@ -52,7 +52,7 @@ Fixed "Python not found" error on mobile devices by:
 
 ### Getting Started
 - **Web App:** `pip install -r requirements.txt && python app.py`
-- **Mobile App:** `cd quran_transcribe && flutter run`
+- **Mobile App:** `cd quran_transcribe && flutter run -d android` (or `-d ios` for iOS)
 
 ## Features
 
