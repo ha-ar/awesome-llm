@@ -1,0 +1,9 @@
+# Lightweight requirements for mobile (Chaquopy)
+# Heavy ML libraries like torch and transformers are too large for mobile
+# Use a lightweight approach or server-based inference instead
+
+flask==3.0.0
+flask-cors==4.0.0
+numpy==1.24.3
+# librosa requires scipy which is large, consider alternatives
+# For mobile, audio processing should be minimal or done server-side
